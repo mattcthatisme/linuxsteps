@@ -1,0 +1,1 @@
+apt-get install awesome awesome-extra sakura tk xfonts-terminus fonts-roboto compton

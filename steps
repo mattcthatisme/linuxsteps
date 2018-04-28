@@ -1,0 +1,196 @@
+xrandr --output LVDS-1 --off --output VGA-1 --mode 1920x1080
+echo "set nocp" >> .vimrc
+echo "set backspace=2" >> .vimrc
+echo "set nu" >> .vimrc
+echo "syntax on" >> .vimrc
+vi .zshrc
+source .zshrc
+mkdir /mnt/deb
+mkdir /mnt/usb
+wpa_passphrase MySpectrumWiFi1a-2G chillybread176
+wpa_passphrase MySpectrumWiFi1a-2G chillybread176 > foo
+ifconfig wlan0 up
+wpa_supplicant -B -i wlan0 -c ./foo -D wext
+dhclient wlan0
+mount -t jfs /dev/sdc1 /mnt/usb
+cp /mnt/usb/backup/Airvpn* .
+openvpn ./AirVpn*
+shred -vn 1 /dev/sda
+parted -s /dev/sda mklabel msdos
+parted -s /dev/sda mkpart primary 2048s 100%
+cryptsetup luksFormat /dev/sda1
+cryptsetup luksOpen /dev/sda1 lvm
+pvcreate /dev/mapper/lvm
+vgcreate vg /dev/mapper/lvm
+lvcreate -L 2G vg -n swap
+lvcreate -l +100%FREE vg -n root
+mkswap /dev/mapper/vg-swap
+swapon /dev/mapper/vg-swap
+echo "90" > /proc/sys/vm/swappiness
+mkfs.jfs /dev/mapper/vg-root
+mount -t jfs /dev/mapper/vg-root /mnt/deb
+git clone https://anonscm.debian.org/git/d-i/debootstrap.git
+cd debootstrap
+export DEBOOTSTRAP_DIR=`pwd`
+./debootstrap --arch=amd64 --variant=minbase stretch /mnt/deb http://mirror.rit.edu/debian
+cd /mnt/deb/root
+cp ~/.vimrc .
+vi .bashrc
+cd /mnt/deb/etc
+vi apt/sources.list
+deb http://security.debian.org/ stretch/updates main contrib non-free
+deb http://ftp.debian.org/debian stretch-updates main contrib non-free
+vi fstab
+/dev/mapper/vg-root / jfs defaults,noatime 0 0
+/dev/mapper/vg-swap none swap sw 0 0
+proc /proc proc defaults 0 0
+echo "127.0.0.1 localhost deblap" > hosts
+echo "deblap" > hostname
+cd
+mount -o bind /dev /mnt/deb/dev
+mount -t proc proc /mnt/deb/proc
+mount -t sysfs sysfs /mnt/deb/sys
+mount -t devpts devpts /mnt/deb/dev/pts
+chroot /mnt/deb /bin/bash
+passwd
+cd
+apt update
+apt install pkg-config apt-utils dialog
+apt install jfsutils locales
+dpkg-reconfigure tzdata
+dpkg-reconfigure locales
+apt install init
+apt install wireless-tools wpasupplicant firmware-iwlwifi dhcpcd5
+apt-cache search linux-image
+apt install linux-image
+apt install cryptsetup lvm2 openvpn
+apt install vim
+cd /
+dd if=/dev/urandom of=/crypto_keyfile.bin bs=512 count=4
+cryptsetup luksAddKey /dev/sda1 /crypto_keyfile.bin
+vi /etc/crypttab
+lvm /dev/sda1 /crypto_keyfile.bin luks,keyscript=/bin/cat
+vi /etc/initramfs/hooks/crypto_keyfile
+#!/bin/sh
+cp /crypto_keyfile.bin "${DESTDIR}"
+chmod +x /etc/initramfs/hooks/crypto_keyfile
+update-initramfs -u
+apt install grub2
+vi /etc/default/grub
+"cryptdevice=/dev/sda1:lvm ipv6.disable=1 quiet"
+GRUB_ENABLE_CRYPTODISK=y
+grub-mkconfig -o /boot/grub/grub.cfg
+grub-install /dev/sda
+exit
+umount /mnt/deb/dev/pts
+umount /mnt/deb/dev
+umount /mnt/dev/sys
+umount /mnt/deb/proc
+umount /mnt/deb
+swapoff /dev/mapper/vg-swap
+vgchange -a n vg
+cryptsetup luksClose lvm
+reboot
+
+--Step1
+
+wpa_passphrase
+cp /backup/netstart .
+cp /backup/Air*
+./netstart
+openvpn ./AirVpn*
+apt install gpm lynx
+vi /etc/lynx/lynx.conf
+apt install sudo bc ed console-setup-linux sharutils gpm ssh bzip2 rcconf unzip unrar zip pciutils usbutils tcl yasm nfs-common alsa-utils alsa-oss mpg123 policykit-1 wget firmware-linux firmware-linux-nonfree firmware-linux-free
+update-pciids
+update-usbids
+
+--Step2
+apt install xorg
+apt install awesome awesome-extra sakura tk xfonts-terminus fonts-roboto compton
+hose /etc/skel
+cp -R /backup/skel /etc
+cat /backup/aa
+groupadd wheel
+useradd -b /home -m -c "Matt's Login" -G users,wheel,mail,voice,cdrom,sudo,audio,video,games,plugdev,netdev -k /etc/skel -s /bin/bash
+passwd matt
+visudo
+
+--Step3
+sudo apt install geeqie
+sudo apt install firefox-esr
+sudo apt install mate-desktop-environment-extra mate-desktop-environment-extras
+sudo apt install handbrake mediainfo tstools libx264-148 x264 dvd+rw-tools growisofs genisoimage joystick jstest-gtk xinput ffmpeg libav-tools libavcodec-extra57 libavdevice57 libavfilter6 libavformat57 libavresample3 libavutil55 libpostproc54 libswresample2 libswscale4 gupnp-dlna-tools transmageddon winff lightdm lightdm-gtk-greeter beneath-a-steel-sky drascula drascula-music flight-of-the-amazon-queen lure-of-the-temptress scummvm dosbox wine winetricks eject playonlinux ttf-mscorefonts-installer transmission-gtk wicd-gtk xpdf
+sudo apt install build-essential git plymouth plymouth-themes
+su
+vi /etc/initramfs/modules
+intel_agp
+drm
+i915 modeset=1
+vi /etc/default/grub
+"splash"
+update-grub2
+cd /usr/share/plymouth-themes/joy
+cp /home/matt/win/hack/GNU_ 1.png
+vi joy.script
+background
+cd
+plymouth-set-default-theme -R joy
+exit
+reboot
+
+--Step4
+git clone --recursive https://github.com/lcpz/awesome-copycats.git
+mkdir .config/awesome
+mv -bv awesome-copycats/* ~/.config/awesome; rm -rf awesome-copycats
+cd .config/awesome
+cp rc.lua.template rc.lua
+vi rc.lua
+defaults theme
+titlebars
+   -- Floating clients.
+    { rule_any = {
+        instance = {
+          "DTA",  -- Firefox addon DownThemAll.
+          "copyq",  -- Includes session name in class.
+        },
+        class = {
+          "Arandr",
+          "Gpick",
+          "Kruler",
+          "MessageWin",  -- kalarm.
+          "Sxiv",
+          "Wpa_gui",
+          "pinentry",
+          "veromix",
+		  "MPlayer",
+		  "mpv",
+          "xtightvncviewer"},
+
+        name = {
+          "Event Tester",  -- xev.
+        },
+        role = {
+          "AlarmWindow",  -- Thunderbird's calendar.
+          "pop-up",       -- e.g. Google Chrome's (detached) Developer Tools.
+        }
+      }, properties = { floating = true }},
+
+cd themes/powerarrow-dark
+mv wall.png wall.png.orig
+cp /home/matt/win/G* .
+ln -s G* wall.png
+vi theme.lua
+/layouts
+
+sudo apt install mplayer2 rygel
+wget -qO - https://eddie.website/repository/keys/eddie_maintainer_gpg.key| sudo apt-key add -
+vi /etc/apt/sources.list
+deb http://eddie.website/repository/apt stable main
+apt update
+apt install airvpn
+sudo dpkg --add-architecture i386
+sudo apt update
+sudo apt install wine32
+sudo apt install zsnes
+

@@ -1,0 +1,9 @@
+sudo apt-get install handbrake mediainfo tstools libx264-146 x264 dvd+rw-tools growisofs genisoimage joystick jstest-gtk xinput ffmpeg libav-tools libavcodec-ffmpeg-extra56 libavdevice-ffmpeg56 libavfilter-ffmpeg5 libavformat-ffmpeg56 libavresample-ffmpeg2 libavutil-ffmpeg54 libpostproc-ffmpeg53 libswresample-ffmpeg1 libswscale-ffmpeg3 gupnp-dlna-tools transcode transmageddon winff lightdm lightdm-gtk-greeter freeciv freeciv-client-extras freeciv-client-gtk freeciv-sound-standard beneath-a-steel-sky drascula drascula-music flight-of-the-amazon-queen lure-of-the-temptress scummvm dosbox wine winetricks eject playonlinux ttf-mscorefonts-installer transmission-gtk wicd-gtk xpdf
+
+mplayer
+
+(Jessie)
+sudo apt-get install handbrake mediainfo tstools libx264-142 x264 dvd+rw-tools growisofs genisoimage joystick jstest-gtk xinput libav-tools libavcodec-extra-56 libavdevice55 libavfilter5 libavformat56 libavresample2 libavutil54 libpostproc52 libswscale3 gupnp-dlna-tools transcode transmageddon winff lightdm lightdm-gtk-greeter freeciv-client-extras freeciv-client-gtk freeciv-sound-standard beneath-a-steel-sky drascula drascula-music flight-of-the-amazon-queen lure-of-the-temptress scummvm dosbox wine winetricks eject playonlinux ttf-mscorefonts-installer transmission-gtk wicd-gtk xpdf
+
+(Stretch)
+sudo apt-get install handbrake mediainfo tstools libx264-148 x264 dvd+rw-tools growisofs genisoimage joystick jstest-gtk xinput ffmpeg libav-tools libavcodec-extra57 libavdevice57 libavfilter6 libavformat57 libavresample3 libavutil55 libpostproc54 libswresample2 libswscale4 gupnp-dlna-tools transmageddon winff lightdm lightdm-gtk-greeter beneath-a-steel-sky drascula drascula-music flight-of-the-amazon-queen lure-of-the-temptress scummvm dosbox wine winetricks eject playonlinux ttf-mscorefonts-installer transmission-gtk wicd-gtk xpdf

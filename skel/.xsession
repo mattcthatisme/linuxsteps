@@ -1,0 +1,3 @@
+xrandr --output LVDS-1 --off --output VGA-1 --mode 1920x1080 &
+compton &
+exec awesome
